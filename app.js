@@ -147,6 +147,57 @@
     a.click(); URL.revokeObjectURL(a.href);
   });
 
+  // ---- CSV 불러오기 ----
+  function parseCSV(text) {
+    const rows = []; let row = [], cur = '', q = false;
+    text = text.replace(/^﻿/, '');
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; }
+        else cur += c;
+      } else if (c === '"') q = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(cur); cur = '';
+        if (row.some((x) => x !== '')) rows.push(row);
+        row = [];
+      } else cur += c;
+    }
+    row.push(cur);
+    if (row.some((x) => x !== '')) rows.push(row);
+    return rows;
+  }
+  $('importBtn').addEventListener('click', () => $('importFile').click());
+  $('importFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const rows = parseCSV(await file.text());
+    if (!rows.length || rows[0][0].trim() !== '날짜') {
+      alert('이 앱에서 내보낸 CSV 파일이 아니에요. (첫 줄이 "날짜,구분,카테고리,금액,메모"여야 해요)');
+      return;
+    }
+    const seen = new Set(items.map((i) => [i.date, i.type, i.category, i.amount, i.memo].join('|')));
+    let added = 0, dup = 0, bad = 0, n = 0;
+    const base = Date.now();
+    for (const r of rows.slice(1)) {
+      const [date, kind, cat, amt, memo = ''] = r.map((x) => x.trim());
+      const type = kind === '수입' ? 'income' : kind === '지출' ? 'expense' : null;
+      const amount = Math.round(Number(amt));
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !type || !(amount > 0)) { bad++; continue; }
+      const category = CATS[type].includes(cat) ? cat : '기타';
+      const sig = [date, type, category, amount, memo].join('|');
+      if (seen.has(sig)) { dup++; continue; }
+      seen.add(sig);
+      items.push({ id: base + n++, type, amount, category, date, memo });
+      added++;
+    }
+    save(); render();
+    alert(`${added}건을 불러왔어요.` + (dup ? `\n이미 있는 ${dup}건은 건너뛰었어요.` : '') + (bad ? `\n형식이 맞지 않는 ${bad}건은 제외했어요.` : ''));
+  });
+
   render();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
