@@ -3,8 +3,8 @@
   "short_name": "가계부",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f4f6fa",
-  "theme_color": "#2f6fed",
+  "background_color": "#050a06",
+  "theme_color": "#050a06",
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
