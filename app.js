@@ -198,6 +198,29 @@
     alert(`${added}건을 불러왔어요.` + (dup ? `\n이미 있는 ${dup}건은 건너뛰었어요.` : '') + (bad ? `\n형식이 맞지 않는 ${bad}건은 제외했어요.` : ''));
   });
 
+  // ---- 색상 테마 ----
+  const THEMES = [
+    ['green', '초록', '#39ff6a'], ['amber', '호박', '#ffb000'], ['cyan', '하늘', '#4de1ff'],
+    ['pink', '분홍', '#ff6ad5'], ['white', '흰색', '#e8e8e8'], ['gameboy', '게임보이', '#9bbc0f'],
+  ];
+  const root = document.documentElement;
+  function applyTheme(name, persist) {
+    if (!THEMES.some((t) => t[0] === name)) name = 'green';
+    root.dataset.theme = name;
+    if (persist) { try { localStorage.setItem('ledger.theme', name); } catch {} }
+    document.querySelectorAll('#themes button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === name)));
+    const meta = document.querySelector('meta[name=theme-color]');
+    if (meta) meta.content = getComputedStyle(root).getPropertyValue('--bg').trim();
+  }
+  $('themes').replaceChildren(...THEMES.map(([id, label, color]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.t = id; b.title = label; b.setAttribute('aria-label', label + ' 테마');
+    b.style.background = color;
+    b.addEventListener('click', () => applyTheme(id, true));
+    return b;
+  }));
+  applyTheme(root.dataset.theme || 'green', false);
+
   render();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();

@@ -1,4 +1,4 @@
-const CACHE = 'ledger-v2';
+const CACHE = 'ledger-v3';
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.json', 'icon.svg', 'fonts/neodgm.woff2'];
 
 self.addEventListener('install', (e) => {

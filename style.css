@@ -4,11 +4,17 @@
   font-display: swap;
 }
 :root {
-  --bg: #050a06; --panel: #0a140c; --text: #39ff6a; --dim: #1f9d45;
-  --line: #14502a; --income: #39ff6a; --expense: #ff5470; --warn: #ffb000;
-  --glow: 0 0 6px rgba(57, 255, 106, .55);
+  --bg: #050a06; --panel: #0a140c; --text: #39ff6a; --dim: #1f9d45; --line: #14502a;
+  --income: var(--text); --expense: #ff5470; --warn: #ffb000;
+  --glow: 0 0 6px color-mix(in srgb, var(--text) 55%, transparent);
+  --glow-strong: color-mix(in srgb, var(--text) 45%, transparent);
   color-scheme: dark;
 }
+:root[data-theme=amber]  { --bg:#0a0600; --panel:#140d02; --text:#ffb000; --dim:#a06c00; --line:#55380a; --expense:#ff5a3c; --warn:#ffe08a; }
+:root[data-theme=cyan]   { --bg:#02080c; --panel:#06131a; --text:#4de1ff; --dim:#1f8aa6; --line:#123f4f; --expense:#ff5470; --warn:#ffd24d; }
+:root[data-theme=pink]   { --bg:#0a040a; --panel:#150a17; --text:#ff6ad5; --dim:#a03a8a; --line:#4a1a42; --expense:#ffe14d; --warn:#6ee7ff; }
+:root[data-theme=white]  { --bg:#0b0b0b; --panel:#141414; --text:#e8e8e8; --dim:#8a8a8a; --line:#3a3a3a; --expense:#ff6b6b; --warn:#ffd166; }
+:root[data-theme=gameboy]{ --bg:#9bbc0f; --panel:#8bac0f; --text:#0f380f; --dim:#306230; --line:#306230; --expense:#0f380f; --warn:#0f380f; --glow:none; --glow-strong:transparent; color-scheme: light; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { background: var(--bg); }
 body {
@@ -52,10 +58,12 @@ main { max-width: 560px; margin: 0 auto; padding: 16px; }
 .summary span::before { content: '['; } .summary span::after { content: ']'; }
 .summary strong { font-size: 16px; font-weight: normal; word-break: keep-all; }
 .income { color: var(--income); } .expense { color: var(--expense); }
-.expense, .summary .expense { text-shadow: 0 0 6px rgba(255, 84, 112, .55); }
+.expense, .summary .expense { text-shadow: 0 0 6px color-mix(in srgb, var(--expense) 55%, transparent); }
+:root[data-theme=gameboy] .expense, :root[data-theme=gameboy] .summary .expense { text-shadow: none; }
 
 .card { border: 2px solid var(--line); background: var(--panel); padding: 14px; margin-top: 14px; }
-.card h2 { margin: 0 0 12px; font-size: 16px; color: var(--warn); font-weight: normal; text-shadow: 0 0 6px rgba(255, 176, 0, .5); }
+.card h2 { margin: 0 0 12px; font-size: 16px; color: var(--warn); font-weight: normal; text-shadow: 0 0 6px color-mix(in srgb, var(--warn) 50%, transparent); }
+:root[data-theme=gameboy] .card h2 { text-shadow: none; }
 .card h2::before { content: '> '; }
 
 .bar-row { margin-bottom: 10px; }
@@ -92,16 +100,17 @@ main { max-width: 560px; margin: 0 auto; padding: 16px; }
   position: fixed; right: 18px; bottom: max(18px, env(safe-area-inset-bottom));
   width: 60px; height: 60px; border: 2px solid var(--text); border-radius: 0;
   background: var(--bg); color: var(--text); font-size: 36px; line-height: 1; cursor: pointer;
-  box-shadow: 4px 4px 0 var(--dim), 0 0 14px rgba(57, 255, 106, .45);
+  box-shadow: 4px 4px 0 var(--dim), 0 0 14px var(--glow-strong);
 }
 #fab:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--dim); background: var(--text); color: var(--bg); text-shadow: none; }
 
 dialog {
   border: 2px solid var(--text); border-radius: 0; padding: 0; width: min(92vw, 420px);
   background: var(--bg); color: var(--text);
-  box-shadow: 6px 6px 0 var(--dim), 0 0 24px rgba(57, 255, 106, .35);
+  box-shadow: 6px 6px 0 var(--dim), 0 0 24px var(--glow-strong);
 }
 dialog::backdrop { background: rgba(0, 0, 0, .78); }
+:root[data-theme=gameboy] dialog::backdrop { background: rgba(15, 56, 15, .75); }
 dialog form { padding: 4px 16px 16px; }
 dialog h2 {
   margin: 0 -16px 8px; padding: 6px 16px; font-size: 16px; font-weight: normal;
@@ -119,11 +128,11 @@ form select {
   background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
   background-size: 6px 6px; background-repeat: no-repeat; padding-right: 32px;
 }
-form input:focus, form select:focus { outline: none; border-color: var(--text); box-shadow: 0 0 8px rgba(57, 255, 106, .5); }
+form input:focus, form select:focus { outline: none; border-color: var(--text); box-shadow: 0 0 8px var(--glow-strong); }
 form input::placeholder { color: var(--dim); opacity: .7; }
 form input[type=number] { -moz-appearance: textfield; }
 form input::-webkit-outer-spin-button, form input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-form input[type=date] { color-scheme: dark; }
+form input[type=date] { color-scheme: inherit; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
 .seg label { margin: 0; position: relative; }
 .seg input { position: absolute; opacity: 0; width: 0; }
@@ -145,4 +154,15 @@ form input[type=date] { color-scheme: dark; }
 
 @media (prefers-reduced-motion: reduce) {
   .top h1::after, .empty::after { animation: none; }
+}
+
+.themes { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 18px; }
+.themes::before { content: '[색상]'; color: var(--dim); font-size: 15px; margin-right: 4px; }
+.themes button {
+  width: 30px; height: 30px; padding: 0; border: 2px solid var(--line); border-radius: 0;
+  cursor: pointer; box-shadow: none;
+}
+.themes button[aria-pressed=true] { border-color: var(--text); outline: 2px solid var(--text); outline-offset: 2px; }
+:root[data-theme=gameboy] body::before {
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 2px, rgba(15, 56, 15, .10) 2px 3px);
 }
